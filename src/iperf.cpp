@@ -2,47 +2,71 @@
 #include <stdexcept>
 #include <unistd.h>
 
-iperf::iperf(int duration, std::string bandwidth_limit)
-    : m_bandwidth_limit(bandwidth_limit)
-    , m_duration(duration)
+iperf::iperf(int duration, std::string location, std::string bandwidth_limit)
+    : m_bandwidth_limit(bandwidth_limit), m_duration(duration)
 {
+    if (location == "hpc")
+    {
+        m_target_location = hpc;
+    }
+    else if (location == "tpc")
+    {
+        m_target_location = tpc;
+    }
+    else
+    {
+        throw std::runtime_error("[iperf][#1] Location is unknown.");
+    }
+
     char hostname[1024];
     gethostname(hostname, 1024);
-    if(std::string(hostname) == "hpc1") {
+    if (std::string(hostname) == "hpc1")
+    {
         m_pc_type = hpc1;
     }
-    else if(std::string(hostname) == "hpc2") {
+    else if (std::string(hostname) == "hpc2")
+    {
         m_pc_type = hpc2;
     }
-    else if(std::string(hostname) == "tpc1") {
+    else if (std::string(hostname) == "tpc1")
+    {
         m_pc_type = tpc1;
     }
-    else if(std::string(hostname) == "tpc2") {
+    else if (std::string(hostname) == "tpc2")
+    {
         m_pc_type = tpc2;
     }
-    else {
-        throw std::runtime_error("[iperf][#1] PC is unknown. Could not get io device name.");
+    else
+    {
+        throw std::runtime_error("[iperf][#2] PC is unknown. Could not get io device name.");
     }
 }
 
-iperf::~iperf() {
+iperf::~iperf()
+{
     system("killall iperf3");
 }
 
-void iperf::server_start() {
+void iperf::server_start()
+{
     create_iperf_process(server, 19101);
     create_iperf_process(server, 19102);
 
-    if(m_pc_type != hpc2) {
+    if ((m_target_location == hpc && m_pc_type != hpc2) || (m_target_location == tpc && m_pc_type != tpc2))
+    {
         create_iperf_process(server, 19103);
     }
 }
 
-void iperf::client_start() {
-    switch (m_pc_type) {
+void iperf::client_start()
+{
+    switch (m_pc_type)
+    {
     case hpc1:
         create_iperf_process(client, 19101, "10.0.0.101");
         create_iperf_process(client, 19101, "10.0.0.102");
+        if(m_target_location == tpc)
+            create_iperf_process(client, 19103, "10.0.0.2");
         break;
     case hpc2:
         create_iperf_process(client, 19101, "10.0.0.1");
@@ -52,7 +76,8 @@ void iperf::client_start() {
     case tpc1:
         create_iperf_process(client, 19102, "10.0.0.1");
         create_iperf_process(client, 19101, "10.0.0.2");
-        create_iperf_process(client, 19103, "10.0.0.102");
+        if(m_target_location == hpc)
+            create_iperf_process(client, 19103, "10.0.0.102");
         break;
     case tpc2:
         create_iperf_process(client, 19103, "10.0.0.1");
@@ -62,27 +87,34 @@ void iperf::client_start() {
     }
 }
 
-bool iperf::create_iperf_process(process_type type, int port, std::string ip) {
+bool iperf::create_iperf_process(process_type type, int port, std::string ip)
+{
     pid_t fork_pid = fork();
 
-    if(-1 == fork_pid) {
+    if (-1 == fork_pid)
+    {
         return false;
     }
-    else if(0 == fork_pid) {
+    else if (0 == fork_pid)
+    {
         int ret = 0;
 
-        switch(type) {
-        case server: {
+        switch (type)
+        {
+        case server:
+        {
             ret = execlp("/usr/bin/iperf3", "/usr/bin/iperf3", "-s", "-p", std::to_string(port).c_str(), "-i", "60", nullptr);
             break;
         }
-        case client: {
+        case client:
+        {
             ret = execlp("/usr/bin/iperf3", "/usr/bin/iperf3", "-u", "-p", std::to_string(port).c_str(), "-i", "60", "-c", ip.c_str(), "-b", m_bandwidth_limit.c_str(), "-t", std::to_string(m_duration).c_str(), nullptr);
             break;
         }
         }
 
-        if(-1 == ret) {
+        if (-1 == ret)
+        {
             return false;
         }
     }

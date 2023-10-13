@@ -11,7 +11,7 @@ enum process_type {
 class iperf
 {
 public:
-    iperf(int duration, std::string bandwidth_limit = "1G");
+    iperf(int duration, std::string location, std::string bandwidth_limit = "1G");
     ~iperf();
     void server_start();
     void client_start();
@@ -25,6 +25,10 @@ private:
         tpc1,
         tpc2,
     } m_pc_type;
+    enum target_location {
+    hpc,
+    tpc,
+    } m_target_location;
     std::string m_bandwidth_limit;
     int m_duration;
 };
