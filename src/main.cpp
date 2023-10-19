@@ -8,21 +8,15 @@ using namespace std;
 int main(int argc, char **argv)
 {
     int duration = 0;
-    std::string location = "hpc";
     if(argc < 2) {
         std::cout << "[main][#1] Please enter a duration." << std::endl;
     }
     else if (argc == 2) {
         duration = std::stoi(argv[1]);
-        std::cout << "[main][#2] No location entered. Defaulting to \"hpc\"." << std::endl << std::endl;
-    }
-    else if (argc == 3) {
-        duration = std::stoi(argv[1]);
-        std::string location = std::string(argv[2]);
     }
 
     system("killall iperf3");
-    iperf my_iperf(duration, location);
+    iperf my_iperf(duration, tpc);
     my_iperf.server_start();
 
     sleep(1);

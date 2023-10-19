@@ -2,22 +2,9 @@
 #include <stdexcept>
 #include <unistd.h>
 
-iperf::iperf(int duration, std::string location, std::string bandwidth_limit)
-    : m_bandwidth_limit(bandwidth_limit), m_duration(duration)
+iperf::iperf(int duration, target_location location, std::string bandwidth_limit)
+    : m_bandwidth_limit(bandwidth_limit), m_duration(duration), m_target_location(location)
 {
-    if (location == "hpc")
-    {
-        m_target_location = hpc;
-    }
-    else if (location == "tpc")
-    {
-        m_target_location = tpc;
-    }
-    else
-    {
-        throw std::runtime_error("[iperf][#1] Location is unknown.");
-    }
-
     char hostname[1024];
     gethostname(hostname, 1024);
     if (std::string(hostname) == "hpc1")
