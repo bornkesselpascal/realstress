@@ -1,6 +1,6 @@
 #include <iostream>
 #include <unistd.h>
-#include "iperf.h"
+#include "network.h"
 #include "stress.h"
 
 using namespace std;
@@ -16,8 +16,8 @@ int main(int argc, char **argv)
     }
 
     system("killall iperf3");
-    iperf my_iperf(duration, tpc);
-    my_iperf.server_start();
+    network my_network(duration, tpc);
+    my_network.server_start();
 
     sleep(1);
     std::cout << "[Waiting for server...] Please hit enter when all machines are in this state." << std::endl;
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
     stress my_timer_stress  (TIMER, 1, duration);
 
     // Network
-    my_iperf.client_start();
+    my_network.client_start();
 
     sleep(duration + 10);
     return 0;

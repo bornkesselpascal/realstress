@@ -13,11 +13,11 @@ enum target_location {
     tpc,
 };
 
-class iperf
+class network
 {
 public:
-    iperf(int duration, target_location location, std::string bandwidth_limit = "1G");
-    ~iperf();
+    network(int duration, target_location location, std::string bandwidth_limit = "1G");
+    ~network();
     void server_start();
     void client_start();
 

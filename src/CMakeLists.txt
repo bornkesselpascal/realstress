@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(RealStress main.cpp
     stress.h stress.cpp
-    iperf.h iperf.cpp)
+    network.h network.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS RealStress

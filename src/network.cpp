@@ -1,8 +1,8 @@
-#include "iperf.h"
+#include "network.h"
 #include <stdexcept>
 #include <unistd.h>
 
-iperf::iperf(int duration, target_location location, std::string bandwidth_limit)
+network::network(int duration, target_location location, std::string bandwidth_limit)
     : m_bandwidth_limit(bandwidth_limit), m_duration(duration), m_target_location(location)
 {
     char hostname[1024];
@@ -25,16 +25,16 @@ iperf::iperf(int duration, target_location location, std::string bandwidth_limit
     }
     else
     {
-        throw std::runtime_error("[iperf][#2] PC is unknown. Could not get io device name.");
+        throw std::runtime_error("[network][#2] PC is unknown. Could not get io device name.");
     }
 }
 
-iperf::~iperf()
+network::~network()
 {
     system("killall iperf3");
 }
 
-void iperf::server_start()
+void network::server_start()
 {
     create_iperf_process(server, 19101);
     create_iperf_process(server, 19102);
@@ -45,7 +45,7 @@ void iperf::server_start()
     }
 }
 
-void iperf::client_start()
+void network::client_start()
 {
     switch (m_pc_type)
     {
@@ -74,7 +74,7 @@ void iperf::client_start()
     }
 }
 
-bool iperf::create_iperf_process(process_type type, int port, std::string ip)
+bool network::create_iperf_process(process_type type, int port, std::string ip)
 {
     pid_t fork_pid = fork();
 
