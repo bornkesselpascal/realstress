@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 int custom_datagram_size = 8900;
-int custom_gap = 40000;
+int custom_gap = 71200;
 
 bool create_iperf_process(process_type type, int port, std::string ip);
 bool create_custom_process(process_type type, int port, std::string ip);
