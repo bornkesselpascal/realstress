@@ -3,7 +3,9 @@
 #include "network.h"
 #include "stress.h"
 
-using namespace std;
+
+network_method  method   = custom;
+target_location location = hpc;
 
 int main(int argc, char **argv)
 {
@@ -16,7 +18,7 @@ int main(int argc, char **argv)
     }
 
     system("killall iperf3");
-    network my_network(duration, tpc);
+    network my_network(duration, location);
     my_network.server_start();
 
     sleep(1);
