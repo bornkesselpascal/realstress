@@ -17,6 +17,9 @@ stress::stress(type type, int num, int duration, int intensity)
     }
     else if(0 == fork_pid) {
         if(num > 0) {
+            pid_t current_pid = getpid();
+            system(("chrt -o -p 0 " + std::to_string(current_pid)).c_str());
+
             int ret = 0;
 
             switch(type) {
