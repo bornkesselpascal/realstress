@@ -1,7 +1,9 @@
 #ifndef IPERF_H
 #define IPERF_H
 
+#include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 enum process_type {
@@ -9,20 +11,15 @@ enum process_type {
     server,
 };
 
-enum target_location {
+enum network_target_location {
     hpc,
     tpc,
-};
-
-enum network_method {
-    iperf,
-    custom,
 };
 
 class network
 {
 public:
-    network(int duration, target_location location, network_method method,  std::string bandwidth_limit = "1G");
+    network(int duration, network_target_location location, std::string bandwidth_limit = "1G");
     ~network();
     void server_start();
     void client_start();
@@ -36,11 +33,9 @@ private:
         tpc1,
         tpc2,
     } m_pc_type;
-    target_location m_target_location;
-    network_method m_method;
+    network_target_location m_target_location;
     std::string m_bandwidth_limit;
     int m_duration;
-    std::vector<std::unique_ptr<std::thread>> m_custom_threads;
 };
 
 #endif // IPERF_H
